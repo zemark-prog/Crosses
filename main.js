@@ -65,7 +65,7 @@ bot.on('text', ctx => {
   if (!secondPart) secondPart = 4;
   secondPart = parseInt(secondPart);
   console.log(typeof(secondPart));
-  if (typeof(secondPart) !== 'number') secondPart = 4;
+  if (isNaN(secondPart)) secondPart = 4;
   if (firstPart === '/start_game' || firstPart === '/start_game@CrossesBot') {
     if (secondPart < MIN_BUTTONS) secondPart = MIN_BUTTONS;
     else if (secondPart > MAX_BUTTONS) secondPart = MAX_BUTTONS;
