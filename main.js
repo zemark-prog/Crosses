@@ -5,8 +5,6 @@
 const MAX_BUTTONS = 8;
 const MIN_BUTTONS = 4;
 
-let N = 4;
-
 const Telegraf = require('telegraf');
 const TOKEN = '1260445498:AAEsTHtANxXyBx9xN93m0w6pN8OIcJrsAK4';
 const bot = new Telegraf(TOKEN);
@@ -33,10 +31,11 @@ function randomInt(min, max) {
 
 const matrixModify = (str, matrix) => {
   const coords = str.split('-');
-  matrix[coords[0]][coords[1]] = 1;
+  if (!matrix[coords[0]][coords[1]]) matrix[coords[0]][coords[1]] = 1;
+  else return true;
 };
 
-const checker = matrix => {
+const checker = (matrix, N) => {
   let isEnded = false;
   for (let i = 0; i < N; i++) {
     for (let j = 0; j < N; j++) {
@@ -63,14 +62,15 @@ bot.on('text', ctx => {
   const firstPart = command[0];
   let secondPart = command[1];
   if (!secondPart) secondPart = 4;
-  secondPart = parseInt(secondPart);
-  console.log(typeof(secondPart));
-  if (isNaN(secondPart)) secondPart = 4;
   if (firstPart === '/start_game' || firstPart === '/start_game@CrossesBot') {
+    try {
+      secondPart = +secondPart;
+    } catch (e) {
+      secondPart = 4;
+    }
     if (secondPart < MIN_BUTTONS) secondPart = MIN_BUTTONS;
     else if (secondPart > MAX_BUTTONS) secondPart = MAX_BUTTONS;
     secondPart = Math.round(secondPart);
-    N = secondPart;
     const chatID = ctx.message.chat.id;
 
     if (!CHATES[chatID]) CHATES[chatID] = { games: {} };
@@ -79,6 +79,8 @@ bot.on('text', ctx => {
 
     const username = ctx.message.from.username;
     CHATES[chatID].games[currGameAmount + 1].users = [username];
+    CHATES[chatID].games[currGameAmount + 1].N = secondPart;
+    CHATES[chatID].games[currGameAmount + 1].msLeft = 5000;
     const inline_keyboard = [[{ text: 'Join!', callback_data: `${currGameAmount + 1}:addUser:${username}` }]];
     const keyboard = {
       reply_markup: JSON.stringify({
@@ -101,6 +103,8 @@ bot.on('callback_query', ctx => {
   console.log(data);
   if (game) {
     const users = game.users;
+    const N = game.N;
+    console.log(game, game.N);
     if (queryFor === 'addUser') {
       if (!users.includes(username)) {
         users.push(username);
@@ -111,27 +115,36 @@ bot.on('callback_query', ctx => {
             game.matrix[i].push(0);
           }
         }
-        const inline_keyboard = [];
-        for (let i = 0; i < N; i++) {
-          inline_keyboard.push([]);
-          for (let j = 0; j < N; j++) {
-            inline_keyboard[i].push({ text: ' ', callback_data: (`${gameID}:addCross:${i}-${j}`).toString() });
-          }
-        }
+        const inline_keyboard = [[{ text: 'Join!', callback_data: `${gameID}:addUser:${username}` }]];
+        if (users.length >= 2) inline_keyboard.push([{ text: 'Start!', callback_data: `${gameID}:startGame:${username}` }]);
         const keyboard = {
-          reply_markup: JSON.stringify(
-            {
-              inline_keyboard
-            })
+          reply_markup: JSON.stringify({
+            inline_keyboard
+          })
         };
-        const currUser = users[randomInt(0, users.length - 1)];
-        game.turn = currUser;
-        bot.telegram.editMessageText(chatID, messageID, undefined, users.join(' vs ') + (`\nTurn : ${currUser}`).toString(), keyboard);
+        bot.telegram.editMessageText(chatID, messageID, undefined, 'Players:\n' + users.join('\n'), keyboard);
       }
+    } else if (queryFor === 'startGame' && users.includes(username)) {
+      const currUser = users[randomInt(0, users.length - 1)];
+      game.turn = currUser;
+      const inline_keyboard = [];
+      for (let i = 0; i < N; i++) {
+        inline_keyboard.push([]);
+        for (let j = 0; j < N; j++) {
+          inline_keyboard[i].push({ text: ' ', callback_data: (`${gameID}:addCross:${i}-${j}`).toString() });
+        }
+      }
+      const keyboard = {
+        reply_markup: JSON.stringify(
+          {
+            inline_keyboard
+          })
+      };
+      bot.telegram.editMessageText(chatID, messageID, undefined, users.join(' vs ') + (`\nTurn: ${game.turn}`).toString(), keyboard);
     } else if (queryFor === 'addCross') {
       if (game.turn === username) {
         const matrix = game.matrix;
-        matrixModify(queryData, matrix);
+        const repeat = matrixModify(queryData, matrix);
         const inline_keyboard = [];
         for (let i = 0; i < N; i++) {
           inline_keyboard.push([]);
@@ -145,14 +158,15 @@ bot.on('callback_query', ctx => {
               inline_keyboard
             })
         };
-
-        const isEnded = checker(matrix);
+        const isEnded = checker(matrix, N);
         if (isEnded) {
           bot.telegram.editMessageText(chatID, messageID, undefined, `${game.turn} is лох!`);
           game = null;
         } else {
-          game.turn = nextTurn(game.turn, users);
-          bot.telegram.editMessageText(chatID, messageID, undefined, users.join(' vs ') + (`\nTurn: ${game.turn}`).toString(), keyboard);
+          if (!repeat) {
+            game.turn = nextTurn(game.turn, users);
+            bot.telegram.editMessageText(chatID, messageID, undefined, users.join(' vs ') + (`\nTurn: ${game.turn}`).toString(), keyboard);
+          }
         }
       }
     }
