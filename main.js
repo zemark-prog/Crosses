@@ -61,13 +61,9 @@ bot.on('text', ctx => {
   const command = text.split(' ');
   const firstPart = command[0];
   let secondPart = command[1];
-  if (!secondPart) secondPart = 4;
+  secondPart = +secondPart;
+  if (isNaN(secondPart)) secondPart = 4;
   if (firstPart === '/start_game' || firstPart === '/start_game@CrossesBot') {
-    try {
-      secondPart = +secondPart;
-    } catch (e) {
-      secondPart = 4;
-    }
     if (secondPart < MIN_BUTTONS) secondPart = MIN_BUTTONS;
     else if (secondPart > MAX_BUTTONS) secondPart = MAX_BUTTONS;
     secondPart = Math.round(secondPart);
