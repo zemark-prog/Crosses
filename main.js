@@ -156,7 +156,7 @@ bot.on('callback_query', ctx => {
         };
         const isEnded = checker(matrix, N);
         if (isEnded) {
-          bot.telegram.editMessageText(chatID, messageID, undefined, `${game.turn} is лох!`);
+          bot.telegram.editMessageText(chatID, messageID, undefined, `${game.turn} has lost!`);
           game = null;
         } else {
           if (!repeat) {
