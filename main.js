@@ -4,8 +4,10 @@ const MAX_BUTTONS = 8;
 const MIN_BUTTONS = 4;
 
 const Telegraf = require('telegraf');
-const TOKEN = '1260445498:AAEsTHtANxXyBx9xN93m0w6pN8OIcJrsAK4';
+require('dotenv').config();
+const TOKEN = process.env.KEY;
 const bot = new Telegraf(TOKEN);
+
 
 const CHATES = {};
 

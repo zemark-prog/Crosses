@@ -1,11 +1,12 @@
 {
   "dependencies": {
+    "dotenv": "^8.2.0",
     "telegraf": "^3.38.0"
   },
   "name": "Crosses-Crosses Bot",
   "version": "1.0.0",
   "description": "Bot for game Crosses-Crosses",
-	"author": "Zegelman Mark",
+  "author": "Zegelman Mark",
   "main": "main.js",
   "repository": {
     "type": "git",
