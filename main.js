@@ -55,24 +55,28 @@ const checker = (matrix, N) => {
   }
   return isEnded;
 };
+const processingNum = secondPart => {
+  secondPart = +secondPart;
+  if (isNaN(secondPart)) secondPart = 4;
+  if (secondPart < MIN_BUTTONS) secondPart = MIN_BUTTONS;
+  else if (secondPart > MAX_BUTTONS) secondPart = MAX_BUTTONS;
+  secondPart = Math.round(secondPart);
+  return secondPart;
+}
+
 
 bot.on('text', ctx => {
   const text = ctx.message.text;
   const command = text.split(' ');
   const firstPart = command[0];
   let secondPart = command[1];
-  secondPart = +secondPart;
-  if (isNaN(secondPart)) secondPart = 4;
-  if (firstPart === '/start_game' || firstPart === '/start_game@CrossesBot') {
-    if (secondPart < MIN_BUTTONS) secondPart = MIN_BUTTONS;
-    else if (secondPart > MAX_BUTTONS) secondPart = MAX_BUTTONS;
-    secondPart = Math.round(secondPart);
-    const chatID = ctx.message.chat.id;
 
+  if (firstPart === '/start_game' || firstPart === '/start_game@CrossesBot') {
+    secondPart = processingNum(secondPart); 
+    const chatID = ctx.message.chat.id;
     if (!CHATES[chatID]) CHATES[chatID] = { games: {} };
     const currGameAmount = Object.keys(CHATES[chatID].games).length;
     CHATES[chatID].games[currGameAmount + 1] = { };
-
     const username = ctx.message.from.username;
     CHATES[chatID].games[currGameAmount + 1].users = [username];
     CHATES[chatID].games[currGameAmount + 1].N = secondPart;
