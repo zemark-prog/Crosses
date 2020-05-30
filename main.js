@@ -62,7 +62,7 @@ const processingNum = secondPart => {
   else if (secondPart > MAX_BUTTONS) secondPart = MAX_BUTTONS;
   secondPart = Math.round(secondPart);
   return secondPart;
-}
+};
 
 
 bot.on('text', ctx => {
@@ -72,7 +72,7 @@ bot.on('text', ctx => {
   let secondPart = command[1];
 
   if (firstPart === '/start_game' || firstPart === '/start_game@CrossesBot') {
-    secondPart = processingNum(secondPart); 
+    secondPart = processingNum(secondPart);
     const chatID = ctx.message.chat.id;
     if (!CHATES[chatID]) CHATES[chatID] = { games: {} };
     const currGameAmount = Object.keys(CHATES[chatID].games).length;
@@ -93,13 +93,13 @@ bot.on('text', ctx => {
 
 const matrixCreate = game => { // create matrix
   game.matrix = [];
-  for (let i = 0; i < game.N; i++) { 
+  for (let i = 0; i < game.N; i++) {
     game.matrix.push([]);
     for (let j = 0; j < game.N; j++) {
       game.matrix[i].push(0);
     }
   }
-  return(game);
+  return (game);
 };
 
 const addUser = (users, username, game, gameID, chatID, messageID) => {
@@ -115,27 +115,60 @@ const addUser = (users, username, game, gameID, chatID, messageID) => {
     };
     bot.telegram.editMessageText(chatID, messageID, undefined, 'Players:\n' + users.join('\n'), keyboard);
   }
-}
+};
 const startGame = (users, game, gameID, chatID, messageID) => {
   const currUser = users[randomInt(0, users.length - 1)];
-      game.turn = currUser;
-      const inline_keyboard = [];
-      for (let i = 0; i < game.N; i++) {
-        inline_keyboard.push([]);
-        for (let j = 0; j < game.N; j++) {
-          inline_keyboard[i].push({ text: ' ', callback_data: (`${gameID}:addCross:${i}-${j}`).toString() });
-        }
-      }
-      const keyboard = {
-        reply_markup: JSON.stringify(
-          {
-            inline_keyboard
-          })
-      };
+  game.turn = currUser;
+  const inline_keyboard = [];
+  for (let i = 0; i < game.N; i++) {
+    inline_keyboard.push([]);
+    for (let j = 0; j < game.N; j++) {
+      inline_keyboard[i].push({ text: ' ', callback_data: (`${gameID}:addCross:${i}-${j}`).toString() });
+    }
+  }
+  const keyboard = {
+    reply_markup: JSON.stringify(
+      {
+        inline_keyboard
+      })
+  };
+  const vs = users.join(' vs ') + (`\nTurn: ${game.turn}`).toString();
+  bot.telegram.editMessageText(chatID, messageID, undefined, vs, keyboard);
+};
+const turn = (isEnded, chatID, messageID, game, repeat, users, keyboard) => {
+  if (isEnded) {
+    bot.telegram.editMessageText(chatID, messageID, undefined, `${game.turn} has lost!`);
+    game = null;
+  } else {
+    if (!repeat) {
+      game.turn = nextTurn(game.turn, users);
       const vs = users.join(' vs ') + (`\nTurn: ${game.turn}`).toString();
       bot.telegram.editMessageText(chatID, messageID, undefined, vs, keyboard);
-}
+    }
+  }
+};
 
+const addCross = (game, username, queryData, gameID, chatID, messageID, users) => {
+  if (game.turn === username) {
+    const matrix = game.matrix;
+    const repeat = matrixModify(queryData, matrix);
+    const inline_keyboard = [];
+    for (let i = 0; i < game.N; i++) {
+      inline_keyboard.push([]);
+      for (let j = 0; j < game.N; j++) {
+        inline_keyboard[i].push({ text: matrix[i][j] ? '❌' : ' ', callback_data: (`${gameID}:addCross:${i}-${j}`).toString() });
+      }
+    }
+    const keyboard = {
+      reply_markup: JSON.stringify(
+        {
+          inline_keyboard
+        })
+    };
+    const isEnded = checker(matrix, game.N);
+    turn(isEnded, chatID, messageID, game, repeat, users, keyboard);
+  }
+};
 
 bot.on('callback_query', ctx => {
   const query = ctx.update.callback_query;
@@ -146,45 +179,17 @@ bot.on('callback_query', ctx => {
   const gameID = +data[0];
   const queryFor = data[1];
   const queryData = data[2];
-  let game = getGameById(gameID, chatID);
+  const game = getGameById(gameID, chatID);
   console.log(data);
   if (game) {
     const users = game.users;
-    const N = game.N;
     console.log(game, game.N);
     if (queryFor === 'addUser') {
       addUser(users, username, game, gameID, chatID, messageID);
     } else if (queryFor === 'startGame' && users.includes(username)) {
       startGame(users, game, gameID, chatID, messageID);
     } else if (queryFor === 'addCross') {
-      if (game.turn === username) {
-        const matrix = game.matrix;
-        const repeat = matrixModify(queryData, matrix);
-        const inline_keyboard = [];
-        for (let i = 0; i < N; i++) {
-          inline_keyboard.push([]);
-          for (let j = 0; j < N; j++) {
-            inline_keyboard[i].push({ text: matrix[i][j] ? '❌' : ' ', callback_data: (`${gameID}:addCross:${i}-${j}`).toString() });
-          }
-        }
-        const keyboard = {
-          reply_markup: JSON.stringify(
-            {
-              inline_keyboard
-            })
-        };
-        const isEnded = checker(matrix, N);
-        if (isEnded) {
-          bot.telegram.editMessageText(chatID, messageID, undefined, `${game.turn} has lost!`);
-          game = null;
-        } else {
-          if (!repeat) {
-            game.turn = nextTurn(game.turn, users);
-            const vs = users.join(' vs ') + (`\nTurn: ${game.turn}`).toString();
-            bot.telegram.editMessageText(chatID, messageID, undefined, vs, keyboard);
-          }
-        }
-      }
+      addCross(game, username, queryData, gameID, chatID, messageID, users);
     }
   }
 });
