@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-/* eslint-disable camelcase */
 'use strict';
 
 const MAX_BUTTONS = 8;
@@ -91,11 +89,23 @@ bot.on('text', ctx => {
   }
 });
 
+const matrixCreate = game => { // create matrix
+  game.matrix = [];
+  for (let i = 0; i < game.N; i++) { 
+    game.matrix.push([]);
+    for (let j = 0; j < game.N; j++) {
+      game.matrix[i].push(0);
+    }
+  }
+  return(game);
+};
+
 bot.on('callback_query', ctx => {
-  const chatID = ctx.update.callback_query.message.chat.id;
-  const messageID = ctx.update.callback_query.message.message_id;
-  const username = ctx.update.callback_query.from.username;
-  const data = ctx.update.callback_query.data.split(':');
+  const query = ctx.update.callback_query;
+  const chatID = query.message.chat.id;
+  const messageID = query.message.message_id;
+  const username = query.from.username;
+  const data = query.data.split(':');
   const gameID = +data[0];
   const queryFor = data[1];
   const queryData = data[2];
@@ -108,13 +118,7 @@ bot.on('callback_query', ctx => {
     if (queryFor === 'addUser') {
       if (!users.includes(username)) {
         users.push(username);
-        game.matrix = [];
-        for (let i = 0; i < N; i++) { // create matrix
-          game.matrix.push([]);
-          for (let j = 0; j < N; j++) {
-            game.matrix[i].push(0);
-          }
-        }
+        game = matrixCreate(game); // create matrix
         const inline_keyboard = [[{ text: 'Join!', callback_data: `${gameID}:addUser:${username}` }]];
         if (users.length >= 2) inline_keyboard.push([{ text: 'Start!', callback_data: `${gameID}:startGame:${username}` }]);
         const keyboard = {
