@@ -22,18 +22,18 @@ function nextTurn(currUser, users) {
   return users[++index >= users.length ? 0 : index];
 }
 
-function randomInt(min, max) {
+function randomInt(min, max) { //random func
   const rand = min - 0.5 + Math.random() * (max - min + 1);
   return Math.round(rand);
 }
 
-const matrixModify = (str, matrix) => {
+const matrixModify = (str, matrix) => { //adding cross to the matrix
   const coords = str.split('-');
   if (!matrix[coords[0]][coords[1]]) matrix[coords[0]][coords[1]] = 1;
   else return true;
 };
 
-const checker = (matrix, N) => {
+const checker = (matrix, N) => { //end game algoorithm
   let isEnded = false;
   for (let i = 0; i < N; i++) {
     for (let j = 0; j < N; j++) {
@@ -144,7 +144,8 @@ bot.on('callback_query', ctx => {
             inline_keyboard
           })
       };
-      bot.telegram.editMessageText(chatID, messageID, undefined, users.join(' vs ') + (`\nTurn: ${game.turn}`).toString(), keyboard);
+      const vs = users.join(' vs ') + (`\nTurn: ${game.turn}`).toString();
+      bot.telegram.editMessageText(chatID, messageID, undefined, vs, keyboard);
     } else if (queryFor === 'addCross') {
       if (game.turn === username) {
         const matrix = game.matrix;
@@ -169,7 +170,8 @@ bot.on('callback_query', ctx => {
         } else {
           if (!repeat) {
             game.turn = nextTurn(game.turn, users);
-            bot.telegram.editMessageText(chatID, messageID, undefined, users.join(' vs ') + (`\nTurn: ${game.turn}`).toString(), keyboard);
+            const vs = users.join(' vs ') + (`\nTurn: ${game.turn}`).toString();
+            bot.telegram.editMessageText(chatID, messageID, undefined, vs, keyboard);
           }
         }
       }
