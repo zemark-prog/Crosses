@@ -102,6 +102,22 @@ const matrixCreate = game => { // create matrix
   return(game);
 };
 
+const addUser = (users, username, game, gameID, chatID, messageID) => {
+  if (!users.includes(username)) {
+    users.push(username);
+    game = matrixCreate(game); // create matrix
+    const inline_keyboard = [[{ text: 'Join!', callback_data: `${gameID}:addUser:${username}` }]];
+    if (users.length >= 2) inline_keyboard.push([{ text: 'Start!', callback_data: `${gameID}:startGame:${username}` }]);
+    const keyboard = {
+      reply_markup: JSON.stringify({
+        inline_keyboard
+      })
+    };
+    bot.telegram.editMessageText(chatID, messageID, undefined, 'Players:\n' + users.join('\n'), keyboard);
+  }
+}
+
+
 bot.on('callback_query', ctx => {
   const query = ctx.update.callback_query;
   const chatID = query.message.chat.id;
@@ -118,18 +134,7 @@ bot.on('callback_query', ctx => {
     const N = game.N;
     console.log(game, game.N);
     if (queryFor === 'addUser') {
-      if (!users.includes(username)) {
-        users.push(username);
-        game = matrixCreate(game); // create matrix
-        const inline_keyboard = [[{ text: 'Join!', callback_data: `${gameID}:addUser:${username}` }]];
-        if (users.length >= 2) inline_keyboard.push([{ text: 'Start!', callback_data: `${gameID}:startGame:${username}` }]);
-        const keyboard = {
-          reply_markup: JSON.stringify({
-            inline_keyboard
-          })
-        };
-        bot.telegram.editMessageText(chatID, messageID, undefined, 'Players:\n' + users.join('\n'), keyboard);
-      }
+      addUser(users, username, game, gameID, chatID, messageID);
     } else if (queryFor === 'startGame' && users.includes(username)) {
       const currUser = users[randomInt(0, users.length - 1)];
       game.turn = currUser;
