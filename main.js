@@ -1,10 +1,10 @@
 'use strict';
 
-const MAX_BUTTONS = 8;
-const MIN_BUTTONS = 4;
-
 const Telegraf = require('telegraf');
 require('dotenv').config();
+
+const MAX_BUTTONS = 8;
+const MIN_BUTTONS = 4;
 const TOKEN = process.env.KEY;
 const bot = new Telegraf(TOKEN);
 
@@ -58,12 +58,16 @@ const checker = (matrix, N) => { //end game algoorithm
 const processingNum = secondPart => {
   secondPart = +secondPart;
   if (isNaN(secondPart)) secondPart = 4;
-  if (secondPart < MIN_BUTTONS) secondPart = MIN_BUTTONS;
+  else if (secondPart < MIN_BUTTONS) secondPart = MIN_BUTTONS;
   else if (secondPart > MAX_BUTTONS) secondPart = MAX_BUTTONS;
   secondPart = Math.round(secondPart);
   return secondPart;
 };
-
+const genKeyboard = inline_keyboard => ({
+  reply_markup: JSON.stringify({
+    inline_keyboard
+  })
+});
 
 bot.on('text', ctx => {
   const text = ctx.message.text;
@@ -82,11 +86,7 @@ bot.on('text', ctx => {
     CHATES[chatID].games[currGameAmount + 1].N = secondPart;
     CHATES[chatID].games[currGameAmount + 1].msLeft = 5000;
     const inline_keyboard = [[{ text: 'Join!', callback_data: `${currGameAmount + 1}:addUser:${username}` }]];
-    const keyboard = {
-      reply_markup: JSON.stringify({
-        inline_keyboard
-      })
-    };
+    const keyboard = genKeyboard(inline_keyboard);
     ctx.reply('Current users:\n' + username + '\n', keyboard);
   }
 });
@@ -108,11 +108,7 @@ const addUser = (users, username, game, gameID, chatID, messageID) => {
     game = matrixCreate(game); // create matrix
     const inline_keyboard = [[{ text: 'Join!', callback_data: `${gameID}:addUser:${username}` }]];
     if (users.length >= 2) inline_keyboard.push([{ text: 'Start!', callback_data: `${gameID}:startGame:${username}` }]);
-    const keyboard = {
-      reply_markup: JSON.stringify({
-        inline_keyboard
-      })
-    };
+    const keyboard = genKeyboard(inline_keyboard);
     bot.telegram.editMessageText(chatID, messageID, undefined, 'Players:\n' + users.join('\n'), keyboard);
   }
 };
@@ -126,12 +122,7 @@ const startGame = (users, game, gameID, chatID, messageID) => {
       inline_keyboard[i].push({ text: ' ', callback_data: (`${gameID}:addCross:${i}-${j}`).toString() });
     }
   }
-  const keyboard = {
-    reply_markup: JSON.stringify(
-      {
-        inline_keyboard
-      })
-  };
+  const keyboard = genKeyboard(inline_keyboard);
   const vs = users.join(' vs ') + (`\nTurn: ${game.turn}`).toString();
   bot.telegram.editMessageText(chatID, messageID, undefined, vs, keyboard);
 };
@@ -159,12 +150,7 @@ const addCross = (game, username, queryData, gameID, chatID, messageID, users) =
         inline_keyboard[i].push({ text: matrix[i][j] ? '❌' : ' ', callback_data: (`${gameID}:addCross:${i}-${j}`).toString() });
       }
     }
-    const keyboard = {
-      reply_markup: JSON.stringify(
-        {
-          inline_keyboard
-        })
-    };
+    const keyboard = genKeyboard(inline_keyboard);
     const isEnded = checker(matrix, game.N);
     turn(isEnded, chatID, messageID, game, repeat, users, keyboard);
   }
