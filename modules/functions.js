@@ -39,8 +39,8 @@ const genKeyboard = inline_keyboard => ({
   })
 });
 
-const start = (firstPart, secondPart, chatID, username, CHATES) => {
-  if (firstPart === '/start_game' || firstPart === '/start_game@CrossesBot') {
+const start = (secondPart, chatID, username, CHATES) => {
+  
     secondPart = processingNum(secondPart);
     if (!CHATES[chatID]) CHATES[chatID] = { games: {} };
     const currGameAmount = Object.keys(CHATES[chatID].games).length;
@@ -50,7 +50,6 @@ const start = (firstPart, secondPart, chatID, username, CHATES) => {
     const joinData = `${currGameAmount + 1}:addUser:${username}`;
     const inline_keyboard = [[{ text: 'Join!', callback_data: joinData }]];
     return inline_keyboard;
-  }
 };
 
 

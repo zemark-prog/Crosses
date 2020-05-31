@@ -15,15 +15,18 @@ const CHATES = {};
 
 
 bot.on('text', ctx => {
+  
   const text = ctx.message.text;
   const command = text.split(' ');
   const firstPart = command[0];
   const secondPart = command[1];
+  if (firstPart === '/start_game' || firstPart === '/start_game@CrossesBot') {
   const chatID = ctx.message.chat.id;
   const username = ctx.message.from.username;
-  const inline_keyboard = start(firstPart, secondPart, chatID, username, CHATES);
+  const inline_keyboard = start(secondPart, chatID, username, CHATES);
   const keyboard = genKeyboard(inline_keyboard);
   ctx.reply('Current users:\n' + username + '\n', keyboard);
+  }
 });
 
 
