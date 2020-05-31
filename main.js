@@ -1,7 +1,7 @@
 'use strict';
 
 const Telegraf = require('telegraf');
-const CONSTANTS = require('./config.js');
+const CONSTANTS = require('./modules/config.js');
 const { MAX_BUTTONS, MIN_BUTTONS, TOKEN } = CONSTANTS;
 const MATRIX = require('./modules/matrix');
 const { matrixModify, checker, matrixCreate } = MATRIX;
