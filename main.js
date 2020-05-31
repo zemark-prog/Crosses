@@ -32,25 +32,22 @@ const matrixModify = (str, matrix) => { //adding cross to the matrix
   else return true;
 };
 
-const checker = (matrix, N) => { //end game algoorithm
+const checker = matrix => { //end game algorithm
   let isEnded = false;
-  for (let i = 0; i < N; i++) {
-    for (let j = 0; j < N; j++) {
-      if (matrix[i][j]) {
-        for (let k = j + 1; k < N; k++) {
-          if (matrix[i][k]) {
-            for (let l = i + 1; l < N; l++) {
-              if (matrix[l][j] && matrix[l][k]) {
-                console.log('easy');
-                isEnded = true;
-              }
+  matrix.forEach(row => {
+    row.forEach((cell1, i) => {
+      row.forEach((cell2, j) => {
+        if(cell1 && cell2 && i !== j) {
+          matrix.forEach(row2 => {
+            if(row !== row2 && row2[i] && row2[j]) {
+              isEnded = true;
             }
-          }
+          })
         }
-      }
-    }
-  }
-  return isEnded;
+      })
+    })
+  })
+  return isEnded
 };
 const processingNum = secondPart => {
   secondPart = +secondPart;
@@ -161,7 +158,7 @@ const addCross = (game, username, queryData, gameID, chatID, messageID, users) =
       }
     }
     const keyboard = genKeyboard(inline_keyboard);
-    const isEnded = checker(matrix, game.N);
+    const isEnded = checker(matrix);
     turn(isEnded, chatID, messageID, game, repeat, users, keyboard);
   }
 };
