@@ -69,26 +69,29 @@ const genKeyboard = inline_keyboard => ({
   })
 });
 
+const start = (firstPart, secondPart, chatID, username) => {
+  if (firstPart === '/start_game' || firstPart === '/start_game@CrossesBot') {
+    secondPart = processingNum(secondPart);   
+    if (!CHATES[chatID]) CHATES[chatID] = { games: {} };
+    const currGameAmount = Object.keys(CHATES[chatID].games).length;
+    CHATES[chatID].games[currGameAmount + 1] = { };    
+    CHATES[chatID].games[currGameAmount + 1].users = [username];
+    CHATES[chatID].games[currGameAmount + 1].N = secondPart;
+    const inline_keyboard = [[{ text: 'Join!', callback_data: `${currGameAmount + 1}:addUser:${username}` }]];
+    return inline_keyboard;
+  }
+}
+
 bot.on('text', ctx => {
   const text = ctx.message.text;
   const command = text.split(' ');
   const firstPart = command[0];
   let secondPart = command[1];
-
-  if (firstPart === '/start_game' || firstPart === '/start_game@CrossesBot') {
-    secondPart = processingNum(secondPart);
-    const chatID = ctx.message.chat.id;
-    if (!CHATES[chatID]) CHATES[chatID] = { games: {} };
-    const currGameAmount = Object.keys(CHATES[chatID].games).length;
-    CHATES[chatID].games[currGameAmount + 1] = { };
-    const username = ctx.message.from.username;
-    CHATES[chatID].games[currGameAmount + 1].users = [username];
-    CHATES[chatID].games[currGameAmount + 1].N = secondPart;
-    CHATES[chatID].games[currGameAmount + 1].msLeft = 5000;
-    const inline_keyboard = [[{ text: 'Join!', callback_data: `${currGameAmount + 1}:addUser:${username}` }]];
-    const keyboard = genKeyboard(inline_keyboard);
-    ctx.reply('Current users:\n' + username + '\n', keyboard);
-  }
+  const chatID = ctx.message.chat.id;
+  const username = ctx.message.from.username;
+  const inline_keyboard = start(firstPart, secondPart, chatID, username);   
+  const keyboard = genKeyboard(inline_keyboard);
+  ctx.reply('Current users:\n' + username + '\n', keyboard);
 });
 
 const matrixCreate = game => { // create matrix
