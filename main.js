@@ -2,34 +2,27 @@
 
 const Telegraf = require('telegraf');
 const CONSTANTS = require('./modules/config.js');
-const { TOKEN } = CONSTANTS;
 const FUNCTIONS = require('./modules/functions.js');
+const { TOKEN } = CONSTANTS;
 const { getGameById, start, addUser, startGame, addCross, genKeyboard } = FUNCTIONS;
-
 
 const bot = new Telegraf(TOKEN);
 
 const CHATES = {};
 
-
-
-
 bot.on('text', ctx => {
-  
   const text = ctx.message.text;
   const command = text.split(' ');
   const firstPart = command[0];
   const secondPart = command[1];
   if (firstPart === '/start_game' || firstPart === '/start_game@CrossesBot') {
-  const chatID = ctx.message.chat.id;
-  const username = ctx.message.from.username;
-  const inline_keyboard = start(secondPart, chatID, username, CHATES);
-  const keyboard = genKeyboard(inline_keyboard);
-  ctx.reply('Current users:\n' + username + '\n', keyboard);
+    const chatID = ctx.message.chat.id;
+    const username = ctx.message.from.username;
+    const inline_keyboard = start(secondPart, chatID, username, CHATES);
+    const keyboard = genKeyboard(inline_keyboard);
+    ctx.reply('Current users:\n' + username + '\n', keyboard);
   }
 });
-
-
 
 bot.on('callback_query', ctx => {
   const query = ctx.update.callback_query;

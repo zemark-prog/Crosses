@@ -11,18 +11,19 @@ const checker = matrix => { //end game algorithm
   matrix.forEach(row => {
     row.forEach((cell1, i) => {
       row.forEach((cell2, j) => {
-        if(cell1 && cell2 && i !== j) {
+        if (cell1 && cell2 && i !== j) {
           matrix.forEach(row2 => {
-            if(row !== row2 && row2[i] && row2[j]) {
+            if (row !== row2 && row2[i] && row2[j]) {
               isEnded = true;
             }
-          })
+          });
         }
-      })
-    })
-  })
-  return isEnded
+      });
+    });
+  });
+  return isEnded;
 };
+
 const matrixCreate = game => { // create matrix
   game.matrix = [];
   for (let i = 0; i < game.N; i++) {

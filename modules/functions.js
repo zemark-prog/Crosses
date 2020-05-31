@@ -1,10 +1,9 @@
 'use strict';
 
-const MATRIX = require('./matrix');
-const { matrixModify, checker, matrixCreate } = MATRIX;
+const MATRIX = require('./matrixProcessing');
 const CONSTANTS = require('./config.js');
+const { matrixModify, checker, matrixCreate } = MATRIX;
 const { MAX_BUTTONS, MIN_BUTTONS } = CONSTANTS;
-
 
 function getGameById(gameID, chatID, CHATES) {
   if (CHATES[chatID]) {
@@ -24,7 +23,6 @@ function randomInt(min, max) { //random func
   return Math.round(rand);
 }
 
-
 const processingNum = secondPart => {
   secondPart = +secondPart;
   if (isNaN(secondPart)) secondPart = 4;
@@ -33,6 +31,7 @@ const processingNum = secondPart => {
   secondPart = Math.round(secondPart);
   return secondPart;
 };
+
 const genKeyboard = inline_keyboard => ({
   reply_markup: JSON.stringify({
     inline_keyboard
@@ -40,19 +39,16 @@ const genKeyboard = inline_keyboard => ({
 });
 
 const start = (secondPart, chatID, username, CHATES) => {
-  
-    secondPart = processingNum(secondPart);
-    if (!CHATES[chatID]) CHATES[chatID] = { games: {} };
-    const currGameAmount = Object.keys(CHATES[chatID].games).length;
-    CHATES[chatID].games[currGameAmount + 1] = { };
-    CHATES[chatID].games[currGameAmount + 1].users = [username];
-    CHATES[chatID].games[currGameAmount + 1].N = secondPart;
-    const joinData = `${currGameAmount + 1}:addUser:${username}`;
-    const inline_keyboard = [[{ text: 'Join!', callback_data: joinData }]];
-    return inline_keyboard;
+  secondPart = processingNum(secondPart);
+  if (!CHATES[chatID]) CHATES[chatID] = { games: {} };
+  const currGameAmount = Object.keys(CHATES[chatID].games).length;
+  CHATES[chatID].games[currGameAmount + 1] = { };
+  CHATES[chatID].games[currGameAmount + 1].users = [username];
+  CHATES[chatID].games[currGameAmount + 1].N = secondPart;
+  const joinData = `${currGameAmount + 1}:addUser:${username}`;
+  const inline_keyboard = [[{ text: 'Join!', callback_data: joinData }]];
+  return inline_keyboard;
 };
-
-
 
 const addUser = (users, username, game, gameID, chatID, messageID, bot) => {
   if (!users.includes(username)) {
@@ -69,6 +65,7 @@ const addUser = (users, username, game, gameID, chatID, messageID, bot) => {
     bot.telegram.editMessageText(chatID, messageID, undefined, user, keyboard);
   }
 };
+
 const startGame = (users, game, gameID, chatID, messageID, bot) => {
   const currUser = users[randomInt(0, users.length - 1)];
   game.turn = currUser;
@@ -84,6 +81,7 @@ const startGame = (users, game, gameID, chatID, messageID, bot) => {
   const vs = users.join(' vs ') + (`\nTurn: ${game.turn}`).toString();
   bot.telegram.editMessageText(chatID, messageID, undefined, vs, keyboard);
 };
+
 const turn = (isEnded, chatID, messageID, game, repeat, users, keyboard, bot) => {
   if (isEnded) {
     const looseData = `${game.turn} has lost!`;
