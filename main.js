@@ -3,6 +3,8 @@
 const Telegraf = require('telegraf');
 const CONSTANTS = require('./config.js');
 const { MAX_BUTTONS, MIN_BUTTONS, TOKEN } = CONSTANTS;
+const MATRIX = require('./modules/matrix');
+const { matrixModify, checker, matrixCreate } = MATRIX;
 
 const bot = new Telegraf(TOKEN);
 
@@ -26,29 +28,7 @@ function randomInt(min, max) { //random func
   return Math.round(rand);
 }
 
-const matrixModify = (str, matrix) => { //adding cross to the matrix
-  const coords = str.split('-');
-  if (!matrix[coords[0]][coords[1]]) matrix[coords[0]][coords[1]] = 1;
-  else return true;
-};
 
-const checker = matrix => { //end game algorithm
-  let isEnded = false;
-  matrix.forEach(row => {
-    row.forEach((cell1, i) => {
-      row.forEach((cell2, j) => {
-        if(cell1 && cell2 && i !== j) {
-          matrix.forEach(row2 => {
-            if(row !== row2 && row2[i] && row2[j]) {
-              isEnded = true;
-            }
-          })
-        }
-      })
-    })
-  })
-  return isEnded
-};
 const processingNum = secondPart => {
   secondPart = +secondPart;
   if (isNaN(secondPart)) secondPart = 4;
@@ -89,16 +69,7 @@ bot.on('text', ctx => {
   ctx.reply('Current users:\n' + username + '\n', keyboard);
 });
 
-const matrixCreate = game => { // create matrix
-  game.matrix = [];
-  for (let i = 0; i < game.N; i++) {
-    game.matrix.push([]);
-    for (let j = 0; j < game.N; j++) {
-      game.matrix[i].push(0);
-    }
-  }
-  return (game);
-};
+
 
 const addUser = (users, username, game, gameID, chatID, messageID) => {
   if (!users.includes(username)) {

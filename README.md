@@ -1,4 +1,6 @@
-# Crosses
+# Crosses-Crosses
+## Cocept
+This bot was created for playing personal 
 
 The two players play the game on a board consisting of four columns by four
 rows. They have to put a cross in one of the cells so that the four crosses are not in
