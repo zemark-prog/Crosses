@@ -71,25 +71,26 @@ const genKeyboard = inline_keyboard => ({
 
 const start = (firstPart, secondPart, chatID, username) => {
   if (firstPart === '/start_game' || firstPart === '/start_game@CrossesBot') {
-    secondPart = processingNum(secondPart);   
+    secondPart = processingNum(secondPart);
     if (!CHATES[chatID]) CHATES[chatID] = { games: {} };
     const currGameAmount = Object.keys(CHATES[chatID].games).length;
-    CHATES[chatID].games[currGameAmount + 1] = { };    
+    CHATES[chatID].games[currGameAmount + 1] = { };
     CHATES[chatID].games[currGameAmount + 1].users = [username];
     CHATES[chatID].games[currGameAmount + 1].N = secondPart;
-    const inline_keyboard = [[{ text: 'Join!', callback_data: `${currGameAmount + 1}:addUser:${username}` }]];
+    const joinData = `${currGameAmount + 1}:addUser:${username}`;
+    const inline_keyboard = [[{ text: 'Join!', callback_data: joinData }]];
     return inline_keyboard;
   }
-}
+};
 
 bot.on('text', ctx => {
   const text = ctx.message.text;
   const command = text.split(' ');
   const firstPart = command[0];
-  let secondPart = command[1];
+  const secondPart = command[1];
   const chatID = ctx.message.chat.id;
   const username = ctx.message.from.username;
-  const inline_keyboard = start(firstPart, secondPart, chatID, username);   
+  const inline_keyboard = start(firstPart, secondPart, chatID, username);
   const keyboard = genKeyboard(inline_keyboard);
   ctx.reply('Current users:\n' + username + '\n', keyboard);
 });
@@ -109,10 +110,15 @@ const addUser = (users, username, game, gameID, chatID, messageID) => {
   if (!users.includes(username)) {
     users.push(username);
     game = matrixCreate(game); // create matrix
-    const inline_keyboard = [[{ text: 'Join!', callback_data: `${gameID}:addUser:${username}` }]];
-    if (users.length >= 2) inline_keyboard.push([{ text: 'Start!', callback_data: `${gameID}:startGame:${username}` }]);
+    const joinData = `${gameID}:addUser:${username}`;
+    const inline_keyboard = [[{ text: 'Join!', callback_data: joinData }]];
+    if (users.length >= 2) {
+      const startData = `${gameID}:startGame:${username}`;
+      inline_keyboard.push([{ text: 'Start!', callback_data: startData }]);
+    }
     const keyboard = genKeyboard(inline_keyboard);
-    bot.telegram.editMessageText(chatID, messageID, undefined, 'Players:\n' + users.join('\n'), keyboard);
+    const user = 'Players:\n' + users.join('\n');
+    bot.telegram.editMessageText(chatID, messageID, undefined, user, keyboard);
   }
 };
 const startGame = (users, game, gameID, chatID, messageID) => {
@@ -122,7 +128,8 @@ const startGame = (users, game, gameID, chatID, messageID) => {
   for (let i = 0; i < game.N; i++) {
     inline_keyboard.push([]);
     for (let j = 0; j < game.N; j++) {
-      inline_keyboard[i].push({ text: ' ', callback_data: (`${gameID}:addCross:${i}-${j}`).toString() });
+      const crossData = (`${gameID}:addCross:${i}-${j}`).toString();
+      inline_keyboard[i].push({ text: ' ', callback_data: crossData });
     }
   }
   const keyboard = genKeyboard(inline_keyboard);
@@ -131,7 +138,8 @@ const startGame = (users, game, gameID, chatID, messageID) => {
 };
 const turn = (isEnded, chatID, messageID, game, repeat, users, keyboard) => {
   if (isEnded) {
-    bot.telegram.editMessageText(chatID, messageID, undefined, `${game.turn} has lost!`);
+    const looseData = `${game.turn} has lost!`;
+    bot.telegram.editMessageText(chatID, messageID, undefined, looseData);
     game = null;
   } else {
     if (!repeat) {
@@ -150,7 +158,9 @@ const addCross = (game, username, queryData, gameID, chatID, messageID, users) =
     for (let i = 0; i < game.N; i++) {
       inline_keyboard.push([]);
       for (let j = 0; j < game.N; j++) {
-        inline_keyboard[i].push({ text: matrix[i][j] ? '❌' : ' ', callback_data: (`${gameID}:addCross:${i}-${j}`).toString() });
+        const crossData = (`${gameID}:addCross:${i}-${j}`).toString();
+        const cross = matrix[i][j] ? '❌' : ' ';
+        inline_keyboard[i].push({ text: cross, callback_data: crossData });
       }
     }
     const keyboard = genKeyboard(inline_keyboard);
