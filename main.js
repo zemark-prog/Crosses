@@ -1,13 +1,10 @@
 'use strict';
 
 const Telegraf = require('telegraf');
-require('dotenv').config();
+const CONSTANTS = require('./config.js');
+const { MAX_BUTTONS, MIN_BUTTONS, TOKEN } = CONSTANTS;
 
-const MAX_BUTTONS = 8;
-const MIN_BUTTONS = 4;
-const TOKEN = process.env.KEY;
 const bot = new Telegraf(TOKEN);
-
 
 const CHATES = {};
 
