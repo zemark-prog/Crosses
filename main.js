@@ -22,7 +22,7 @@ bot.on('text', ctx => {
   const secondPart = command[1];
   if (firstPart === '/start_game' || firstPart === '/start_game@CrossesCrossesBot') {
     const chatID = ctx.message.chat.id;
-    const userID = ctx.message.user.id;
+    const userID = ctx.message.from.user.id;
     if(userID === chatID){
       ctx.reply('This bot is used in group chats only');
     }else{
