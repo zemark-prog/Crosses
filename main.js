@@ -3,7 +3,7 @@
 const Telegraf = require('telegraf');
 const CONSTANTS = require('./modules/config.js');
 const FUNCTIONS = require('./modules/functions.js');
-const { TOKEN } = CONSTANTS;
+const { TOKEN, BOT_URL } = CONSTANTS;
 const {replyFile, getGameById, start, addUser, startGame, addCross, genKeyboard } = FUNCTIONS;
 
 const bot = new Telegraf(TOKEN);
