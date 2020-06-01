@@ -22,10 +22,15 @@ bot.on('text', ctx => {
   const secondPart = command[1];
   if (firstPart === '/start_game' || firstPart === '/start_game@CrossesCrossesBot') {
     const chatID = ctx.message.chat.id;
-    const username = ctx.message.from.username;
-    const inline_keyboard = start(secondPart, chatID, username, CHATES);
-    const keyboard = genKeyboard(inline_keyboard);
-    ctx.reply('Current users:\n' + username + '\n', keyboard);
+    const userID = ctx.message.user.id;
+    if(userID === chatID){
+      ctx.reply('This bot is used in group chats only');
+    }else{
+      const username = ctx.message.from.username;
+      const inline_keyboard = start(secondPart, chatID, username, CHATES);
+      const keyboard = genKeyboard(inline_keyboard);
+      ctx.reply('Current users:\n' + username + '\n', keyboard);
+    }
   }
 });
 
