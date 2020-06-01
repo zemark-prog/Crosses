@@ -1,14 +1,17 @@
 {
+  "name": "crosses-crosses-bot",
+  "version": "1.0.0",
+  "description": "This bot was created for playing own-developed game Crosses-Crosses",
+  "main": "main.js",
   "dependencies": {
     "dotenv": "^8.2.0",
     "node": "^14.3.0",
     "telegraf": "^3.38.0"
   },
-  "name": "Crosses-Crosses Bot",
-  "version": "1.0.0",
-  "description": "Bot for game Crosses-Crosses",
-  "author": "Zegelman Mark",
-  "main": "main.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zemark-prog/Crosses-Crosses-Bot.git"
@@ -16,13 +19,14 @@
   "keywords": [
     "telegram",
     "bot",
-    "npm",
+    "Telegraf",
     "node",
-    "Telegraf"
+    "Crosses-Crosses"
   ],
+  "author": "Mark Zegelman",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/zemark-prog/Crosses-Crosses-Bot/issues"
   },
-  "homepage": "https://github.com/zemark-prog/Crosses-Crosses-Bot"
+  "homepage": "https://github.com/zemark-prog/Crosses-Crosses-Bot#readme"
 }
