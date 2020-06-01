@@ -13,7 +13,6 @@ bot.startWebhook(`/bot${TOKEN}`, null, process.env.PORT);
 
 const CHATES = {};
 
-
 bot.help(ctx => replyFile(ctx, './texts/help.txt'));
 bot.command('rules', ctx => replyFile(ctx, './texts/rules.txt'));
 bot.on('text', ctx => {
