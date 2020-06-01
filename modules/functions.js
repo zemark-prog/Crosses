@@ -5,7 +5,7 @@ const CONSTANTS = require('./config.js');
 const { matrixModify, checker, matrixCreate } = MATRIX;
 const { MAX_BUTTONS, MIN_BUTTONS } = CONSTANTS;
 
-function getGameById(gameID, chatID, CHATES) {
+function getGameById(gameID, chatID, CHATES) { //finds the right game
   if (CHATES[chatID]) {
     for (const id in CHATES[chatID].games) {
       if (id === gameID.toString()) return CHATES[chatID].games[id];
@@ -13,17 +13,17 @@ function getGameById(gameID, chatID, CHATES) {
   }
 }
 
-function nextTurn(currUser, users) {
+function nextTurn(currUser, users) { //returns user whose turn is next
   let index = users.indexOf(currUser);
   return users[++index >= users.length ? 0 : index];
 }
 
-function randomInt(min, max) { //random func
+function randomInt(min, max) { //random function
   const rand = min - 0.5 + Math.random() * (max - min + 1);
   return Math.round(rand);
 }
 
-const processingNum = secondPart => {
+const processingNum = secondPart => { //processing the side size
   secondPart = +secondPart;
   if (isNaN(secondPart)) secondPart = 4;
   else if (secondPart < MIN_BUTTONS) secondPart = MIN_BUTTONS;
@@ -38,7 +38,7 @@ const genKeyboard = inline_keyboard => ({
   })
 });
 
-const start = (secondPart, chatID, username, CHATES) => {
+const start = (secondPart, chatID, username, CHATES) => {//makes keyboard after /start_game
   secondPart = processingNum(secondPart);
   if (!CHATES[chatID]) CHATES[chatID] = { games: {} };
   const currGameAmount = Object.keys(CHATES[chatID].games).length;
@@ -50,7 +50,7 @@ const start = (secondPart, chatID, username, CHATES) => {
   return inline_keyboard;
 };
 
-const addUser = (users, username, game, gameID, chatID, messageID, bot) => {
+const addUser = (users, username, game, gameID, chatID, messageID, bot) => {//adds a user to the game
   if (!users.includes(username)) {
     users.push(username);
     game = matrixCreate(game); // create matrix
@@ -66,8 +66,8 @@ const addUser = (users, username, game, gameID, chatID, messageID, bot) => {
   }
 };
 
-const startGame = (users, game, gameID, chatID, messageID, bot) => {
-  const currUser = users[randomInt(0, users.length - 1)];
+const startGame = (users, game, gameID, chatID, messageID, bot) => {//starts the game
+  const currUser = users[randomInt(0, users.length - 1)];//first turn choosage
   game.turn = currUser;
   const inline_keyboard = [];
   for (let i = 0; i < game.N; i++) {
@@ -82,7 +82,7 @@ const startGame = (users, game, gameID, chatID, messageID, bot) => {
   bot.telegram.editMessageText(chatID, messageID, undefined, vs, keyboard);
 };
 
-const turn = (isEnded, chatID, messageID, game, repeat, users, keyboard, bot) => {
+const turn = (isEnded, chatID, messageID, game, repeat, users, keyboard, bot) => {//next turn
   if (isEnded) {
     const looseData = `${game.turn} has lost!`;
     bot.telegram.editMessageText(chatID, messageID, undefined, looseData);
@@ -96,7 +96,7 @@ const turn = (isEnded, chatID, messageID, game, repeat, users, keyboard, bot) =>
   }
 };
 
-const addCross = (game, username, queryData, gameID, chatID, messageID, users, bot) => {
+const addCross = (game, username, queryData, gameID, chatID, messageID, users, bot) => {//ads a cross
   if (game.turn === username) {
     const matrix = game.matrix;
     const repeat = matrixModify(queryData, matrix);
