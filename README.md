@@ -5,7 +5,7 @@ The game can be played by 2 or more players on the square board with a side from
 In the end of the game the bot will tell the looser. Enjoy this interesting game.
 
 ## API/Frameworks
-* Telegraf
+* [Telegraf](https://telegraf.js.org/#/)
 
 ## How to use it
 You need to add this bot to the group. Then write /start_game n where n is optional parameter of the board side(default value of n is 4).After creating people would be able to join the game by clicking the button 'Join!'. When there would be 2 or more players the button 'Start' will appear. Only players who joined the game are able to start it. It could be many games at the same chat simultaneously. The person whose turn is first is choosen randomly.
