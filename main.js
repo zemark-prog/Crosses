@@ -12,13 +12,13 @@ const CHATES = {};
 
 
 bot.help(ctx => replyFile(ctx, './texts/help.txt'));
-bot.command('rules', ctx => replyFile(ctx, './tetxts/rules.txt'));
+bot.command('rules', ctx => replyFile(ctx, './texts/rules.txt'));
 bot.on('text', ctx => {
   const text = ctx.message.text;
   const command = text.split(' ');
   const firstPart = command[0];
   const secondPart = command[1];
-  if (firstPart === '/start_game' || firstPart === '/start_game@CrossesBot') {
+  if (firstPart === '/start_game' || firstPart === '/start_game@CrossesCrossesBot') {
     const chatID = ctx.message.chat.id;
     const username = ctx.message.from.username;
     const inline_keyboard = start(secondPart, chatID, username, CHATES);
