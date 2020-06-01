@@ -8,7 +8,7 @@ In the end of the game the bot will tell the looser. Enjoy this interesting game
 * Telegraf
 
 ## How to use it
-You need to add this bot to the group. Then write /start_game n where n is optional parametr of the board side(default value of n is 4).After creating people would be able to join the game by clicking the button 'Join!'. When there would be 2 or players the button 'Start' will appear. Only players who joined the game are able to start it. It could be many games at the same chat simultaneously.
+You need to add this bot to the group. Then write /start_game n where n is optional parameter of the board side(default value of n is 4).After creating people would be able to join the game by clicking the button 'Join!'. When there would be 2 or more players the button 'Start' will appear. Only players who joined the game are able to start it. It could be many games at the same chat simultaneously. The person whose turn is first is choosen randomly.
 
 ## Rules
 The players play the game on a board consisting of n columns by n

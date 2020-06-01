@@ -2,6 +2,7 @@
 
 const MATRIX = require('./matrixProcessing');
 const CONSTANTS = require('./config.js');
+const fs = require('fs');
 const { matrixModify, checker, matrixCreate } = MATRIX;
 const { MAX_BUTTONS, MIN_BUTTONS } = CONSTANTS;
 
@@ -12,6 +13,7 @@ function getGameById(gameID, chatID, CHATES) { //finds the right game
     }
   }
 }
+const replyFile = (ctx, file) => ctx.reply(fs.readFileSync(file, 'utf8'));//reply with a file
 
 function nextTurn(currUser, users) { //returns user whose turn is next
   let index = users.indexOf(currUser);
@@ -116,6 +118,7 @@ const addCross = (game, username, queryData, gameID, chatID, messageID, users, b
 };
 
 module.exports = {
+  replyFile,
   getGameById,
   start,
   addUser,

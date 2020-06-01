@@ -1,0 +1,4 @@
+You need to write /rules if you want to know how to play.
+To start you need to write '/start_game n' where n is optional parameter of the board side(default value of n is 4).
+After creating people would be able to join the game by clicking the button 'Join!'. 
+When there would be 2 or more players the button 'Start' will appear. 

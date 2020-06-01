@@ -4,12 +4,15 @@ const Telegraf = require('telegraf');
 const CONSTANTS = require('./modules/config.js');
 const FUNCTIONS = require('./modules/functions.js');
 const { TOKEN } = CONSTANTS;
-const { getGameById, start, addUser, startGame, addCross, genKeyboard } = FUNCTIONS;
+const {replyFile, getGameById, start, addUser, startGame, addCross, genKeyboard } = FUNCTIONS;
 
 const bot = new Telegraf(TOKEN);
 
 const CHATES = {};
 
+
+bot.help(ctx => replyFile(ctx, './texts/help.txt'));
+bot.command('rules', ctx => replyFile(ctx, './tetxts/rules.txt'));
 bot.on('text', ctx => {
   const text = ctx.message.text;
   const command = text.split(' ');
