@@ -8,6 +8,9 @@ const {replyFile, getGameById, start, addUser, startGame, addCross, genKeyboard 
 
 const bot = new Telegraf(TOKEN);
 
+bot.telegram.setWebhook(`${BOT_URL}/bot${TOKEN}`);
+bot.startWebhook(`/bot${TOKEN}`, null, process.env.PORT);
+
 const CHATES = {};
 
 
@@ -50,5 +53,3 @@ bot.on('callback_query', ctx => {
     }
   }
 });
-
-bot.launch();
