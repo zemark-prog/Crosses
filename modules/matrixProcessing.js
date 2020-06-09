@@ -11,7 +11,7 @@ const checker = matrix => (x, y) => { //end game algorithm
 		if (matrix[i][y] !== 1 || i === +x)
 			continue;
 		for (let j = 0; j < matrix.length; j++) {
-			if (matrix[x][j] !== 1 || j === +y || field[i][j] !== 1)
+			if (matrix[x][j] !== 1 || j === +y || matrix[i][j] !== 1)
 				continue;
 			isEnded = true;
 		}
