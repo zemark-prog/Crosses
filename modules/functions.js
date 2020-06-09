@@ -101,7 +101,8 @@ const turn = (isEnded, chatID, messageID, game, repeat, users, keyboard, bot) =>
 const addCross = (game, username, queryData, gameID, chatID, messageID, users, bot) => {//ads a cross
   if (game.turn === username) {
     const matrix = game.matrix;
-    const repeat = matrixModify(queryData, matrix);
+    const coords = queryData.split('-');
+    const repeat = matrixModify(coords, matrix);
     const inline_keyboard = [];
     for (let i = 0; i < game.N; i++) {
       inline_keyboard.push([]);
@@ -112,7 +113,8 @@ const addCross = (game, username, queryData, gameID, chatID, messageID, users, b
       }
     }
     const keyboard = genKeyboard(inline_keyboard);
-    const isEnded = checker(matrix);
+    const isCornerInField = checker(matrix)
+    const isEnded = isCornerInField(coords[0], coords[1]);
     turn(isEnded, chatID, messageID, game, repeat, users, keyboard, bot);
   }
 };

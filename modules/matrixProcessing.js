@@ -1,28 +1,21 @@
 'use strict';
 
-const matrixModify = (str, matrix) => { //adding cross to the matrix
-  const coords = str.split('-');
+const matrixModify = (coords, matrix) => { //adding cross to the matrix
   if (!matrix[coords[0]][coords[1]]) matrix[coords[0]][coords[1]] = 1;
   else return true;
 };
 
-const checker = matrix => { //end game algorithm
-  let isEnded = false;
-  matrix.forEach(row => {
-    row.forEach((cell1, i) => {
-      row.forEach((cell2, j) => {
-        if (cell1 && cell2 && i !== j) {
-          matrix.forEach(row2 => {
-            if (row !== row2 && row2[i] && row2[j]) {
-              isEnded = true;
-            }
-          });
-        }
-      });
-    });
-  });
-  return isEnded;
-};
+const checker = matrix => (x, y) => { //end game algorithm
+	for (let i = 0; i < matrix.length; i++) {
+		if (matrix[i][y] !== 1 || i === x)
+			continue;
+		for (let j = 0; j < matrix.length; j++) {
+			if (matrix[x][j] !== 1 || j === y)
+				continue;
+			return true;
+		}
+	}
+}
 
 const matrixCreate = game => { // create matrix
   game.matrix = [];
