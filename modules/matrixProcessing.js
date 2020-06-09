@@ -6,14 +6,14 @@ const matrixModify = (coords, matrix) => { //adding cross to the matrix
 };
 
 const checker = matrix => (x, y) => { //end game algorithm
-  let isEnded = false;
+  let isEnded = true;
 	for (let i = 0; i < matrix.length; i++) {
 		if (matrix[i][y] !== 1 || i === x)
 			continue;
 		for (let j = 0; j < matrix.length; j++) {
 			if (matrix[x][j] !== 1 || j === y)
 				continue;
-			isEnded = true;
+			isEnded = false;
 		}
   }
   return isEnded;
