@@ -115,6 +115,7 @@ const addCross = (game, username, queryData, gameID, chatID, messageID, users, b
     const keyboard = genKeyboard(inline_keyboard);
     const isCornerInField = checker(matrix)
     const isEnded = isCornerInField(coords[0], coords[1]);
+    console.log(coords[0], coords[1], isEnded, matrix);
     turn(isEnded, chatID, messageID, game, repeat, users, keyboard, bot);
   }
 };
