@@ -86,15 +86,15 @@ const startGame = obj => { //starts the game
   obj.bot.telegram.editMessageText(obj.chatID, obj.messageID, undefined, vs, keyboard);
 };
 
-const turn = (isEnded, chatID, messageID, game, repeat, users, keyboard, bot) => { //next turn
+const turn = (isEnded, obj, keyboard, repeat) => { //next turn
   if (isEnded) {
-    const looseData = `${game.turn} has lost!`;
-    bot.telegram.editMessageText(chatID, messageID, undefined, looseData);
-    game = null;
+    const looseData = `${obj.game.turn} has lost!`;
+    obj.bot.telegram.editMessageText(obj.chatID, obj.messageID, undefined, looseData);
+    obj.game = null;
   } else if (!repeat) {
-    game.turn = nextTurn(game.turn, users);
-    const vs = users.join(' vs ') + `\nTurn: ${game.turn}`.toString();
-    bot.telegram.editMessageText(chatID, messageID, undefined, vs, keyboard);
+    obj.game.turn = nextTurn(obj.game.turn, obj.users);
+    const vs = obj.users.join(' vs ') + `\nTurn: ${obj.game.turn}`.toString();
+    obj.bot.telegram.editMessageText(obj.chatID, obj.messageID, undefined, vs, keyboard);
   }
 };
 
@@ -116,7 +116,7 @@ const addCross = obj => { //ads a cross
     const isCornerInField = checker(matrix);
     const isEnded = isCornerInField(coords[0], coords[1]);
     console.log(coords[0], coords[1], isEnded, matrix);
-    turn(isEnded, obj.chatID, obj.messageID, obj.game, repeat, obj.users, keyboard, obj.bot);
+    turn(isEnded, obj, keyboard, repeat);
   }
 };
 
