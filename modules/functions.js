@@ -36,11 +36,11 @@ const processingNum = secondPart => { //processing the side size
 
 const genKeyboard = inline_keyboard => ({
   reply_markup: JSON.stringify({
-    inline_keyboard
-  })
+    inline_keyboard,
+  }),
 });
 
-const start = (secondPart, chatID, username, CHATES) => {//makes keyboard after /start_game
+const start = (secondPart, chatID, username, CHATES) => { //makes keyboard after /start_game
   secondPart = processingNum(secondPart);
   if (!CHATES[chatID]) CHATES[chatID] = { games: {} };
   const currGameAmount = Object.keys(CHATES[chatID].games).length;
@@ -52,71 +52,70 @@ const start = (secondPart, chatID, username, CHATES) => {//makes keyboard after 
   return inline_keyboard;
 };
 
-const addUser = (users, username, game, gameID, chatID, messageID, bot) => {//adds a user to the game
-  if (!users.includes(username)) {
-    users.push(username);
-    game = matrixCreate(game); // create matrix
-    const joinData = `${gameID}:addUser:${username}`;
+const addUser = obj => { //adds a user to the game
+  if (!obj.users.includes(obj.username)) {
+    obj.users.push(obj.username);
+    obj.game = matrixCreate(obj.game); // create matrix
+    const joinData = `${obj.gameID}:addUser:${obj.username}`;
     const inline_keyboard = [[{ text: 'Join!', callback_data: joinData }]];
-    if (users.length >= 2) {
-      const startData = `${gameID}:startGame:${username}`;
+    if (obj.users.length >= 2) {
+      const startData = `${obj.gameID}:startGame:${obj.username}`;
       inline_keyboard.push([{ text: 'Start!', callback_data: startData }]);
     }
     const keyboard = genKeyboard(inline_keyboard);
-    const user = 'Players:\n' + users.join('\n');
-    bot.telegram.editMessageText(chatID, messageID, undefined, user, keyboard);
+    const user = 'Players:\n' + obj.users.join('\n');
+    obj.bot.telegram.editMessageText(obj.chatID, obj.messageID, undefined, user, keyboard);
   }
 };
 
-const startGame = (users, game, gameID, chatID, messageID, bot) => {//starts the game
-  const currUser = users[randomInt(0, users.length - 1)];//first turn choosage
-  game.turn = currUser;
+const startGame = obj => { //starts the game
+  const random = randomInt(0, obj.users.length - 1);
+  const currUser = obj.users[random];//first turn choosage
+  obj.game.turn = currUser;
   const inline_keyboard = [];
-  for (let i = 0; i < game.N; i++) {
+  for (let i = 0; i < obj.game.N; i++) {
     inline_keyboard.push([]);
-    for (let j = 0; j < game.N; j++) {
-      const crossData = (`${gameID}:addCross:${i}-${j}`).toString();
+    for (let j = 0; j < obj.game.N; j++) {
+      const crossData = `${obj.gameID}:addCross:${i}-${j}`.toString();
       inline_keyboard[i].push({ text: ' ', callback_data: crossData });
     }
   }
   const keyboard = genKeyboard(inline_keyboard);
-  const vs = users.join(' vs ') + (`\nTurn: ${game.turn}`).toString();
-  bot.telegram.editMessageText(chatID, messageID, undefined, vs, keyboard);
+  const vs = obj.users.join(' vs ') + `\nTurn: ${obj.game.turn}`.toString();
+  obj.bot.telegram.editMessageText(obj.chatID, obj.messageID, undefined, vs, keyboard);
 };
 
-const turn = (isEnded, chatID, messageID, game, repeat, users, keyboard, bot) => {//next turn
+const turn = (isEnded, chatID, messageID, game, repeat, users, keyboard, bot) => { //next turn
   if (isEnded) {
     const looseData = `${game.turn} has lost!`;
     bot.telegram.editMessageText(chatID, messageID, undefined, looseData);
     game = null;
-  } else {
-    if (!repeat) {
-      game.turn = nextTurn(game.turn, users);
-      const vs = users.join(' vs ') + (`\nTurn: ${game.turn}`).toString();
-      bot.telegram.editMessageText(chatID, messageID, undefined, vs, keyboard);
-    }
+  } else if (!repeat) {
+    game.turn = nextTurn(game.turn, users);
+    const vs = users.join(' vs ') + `\nTurn: ${game.turn}`.toString();
+    bot.telegram.editMessageText(chatID, messageID, undefined, vs, keyboard);
   }
 };
 
-const addCross = (game, username, queryData, gameID, chatID, messageID, users, bot) => {//ads a cross
-  if (game.turn === username) {
-    const matrix = game.matrix;
-    const coords = queryData.split('-');
+const addCross = obj => { //ads a cross
+  if (obj.game.turn === obj.username) {
+    const matrix = obj.game.matrix;
+    const coords = obj.queryData.split('-');
     const repeat = matrixModify(coords, matrix);
     const inline_keyboard = [];
-    for (let i = 0; i < game.N; i++) {
+    for (let i = 0; i < obj.game.N; i++) {
       inline_keyboard.push([]);
-      for (let j = 0; j < game.N; j++) {
-        const crossData = (`${gameID}:addCross:${i}-${j}`).toString();
+      for (let j = 0; j < obj.game.N; j++) {
+        const crossData = `${obj.gameID}:addCross:${i}-${j}`.toString();
         const cross = matrix[i][j] ? '❌' : ' ';
         inline_keyboard[i].push({ text: cross, callback_data: crossData });
       }
     }
     const keyboard = genKeyboard(inline_keyboard);
-    const isCornerInField = checker(matrix)
+    const isCornerInField = checker(matrix);
     const isEnded = isCornerInField(coords[0], coords[1]);
     console.log(coords[0], coords[1], isEnded, matrix);
-    turn(isEnded, chatID, messageID, game, repeat, users, keyboard, bot);
+    turn(isEnded, obj.chatID, obj.messageID, obj.game, repeat, obj.users, keyboard, obj.bot);
   }
 };
 

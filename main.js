@@ -4,7 +4,7 @@ const Telegraf = require('telegraf');
 const CONSTANTS = require('./modules/config.js');
 const FUNCTIONS = require('./modules/functions.js');
 const { TOKEN, BOT_URL } = CONSTANTS;
-const {replyFile, getGameById, start, addUser, startGame, addCross, genKeyboard } = FUNCTIONS;
+const { replyFile, getGameById, start, addUser, startGame, addCross, genKeyboard } = FUNCTIONS;
 
 const bot = new Telegraf(TOKEN);
 
@@ -23,9 +23,9 @@ bot.on('text', ctx => {
   if (firstPart === '/start_game' || firstPart === '/start_game@CrossesCrossesBot') {
     const chatID = ctx.message.chat.id;
     const userID = ctx.message.from.id;
-    if(userID === chatID){
+    if (userID === chatID) {
       ctx.reply('This bot is used in group chats only');
-    }else{
+    } else {
       const username = ctx.message.from.username;
       const inline_keyboard = start(secondPart, chatID, username, CHATES);
       const keyboard = genKeyboard(inline_keyboard);
@@ -47,13 +47,15 @@ bot.on('callback_query', ctx => {
   console.log(data);
   if (game) {
     const users = game.users;
+    const obj = { users, username, game, gameID, chatID, messageID, bot };
     console.log(game, game.N);
     if (queryFor === 'addUser') {
-      addUser(users, username, game, gameID, chatID, messageID, bot);
+      addUser(obj);
     } else if (queryFor === 'startGame' && users.includes(username)) {
-      startGame(users, game, gameID, chatID, messageID, bot);
+      startGame(obj);
     } else if (queryFor === 'addCross') {
-      addCross(game, username, queryData, gameID, chatID, messageID, users, bot);
+      obj.queryData = queryData;
+      addCross(obj);
     }
   }
 });
