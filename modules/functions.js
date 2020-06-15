@@ -13,7 +13,9 @@ function getGameById(gameID, chatID, CHATES) { //finds the right game
     }
   }
 }
-const replyFile = (ctx, file) => ctx.reply(fs.readFileSync(file, 'utf8'));//reply with a file
+const replyFile = (ctx, file) => {
+  ctx.reply(fs.readFileSync(file, 'utf8'));
+}; //reply with a file
 
 function nextTurn(currUser, users) { //returns user whose turn is next
   let index = users.indexOf(currUser);
@@ -35,12 +37,12 @@ const processingNum = secondPart => { //processing the side size
 };
 
 const genKeyboard = inlineKeyboard => ({
-  reply_markup: JSON.stringify({
-    inline_keyboard: inlineKeyboard,
+  'reply_markup': JSON.stringify({
+    'inline_keyboard': inlineKeyboard,
   }),
 });
-
-const start = (secondPart, chatID, username, CHATES) => { //makes keyboard after /start_game
+//makes keyboard after /start_game
+const start = (secondPart, chatID, username, CHATES) => {
   secondPart = processingNum(secondPart);
   if (!CHATES[chatID]) CHATES[chatID] = { games: {} };
   const currGameAmount = Object.keys(CHATES[chatID].games).length;
@@ -49,7 +51,7 @@ const start = (secondPart, chatID, username, CHATES) => { //makes keyboard after
     N: secondPart,
   };
   const joinData = `${currGameAmount + 1}:addUser:${username}`;
-  const inlineKeyboard = [[{ text: 'Join!', callback_data: joinData }]];
+  const inlineKeyboard = [[{ text: 'Join!', 'callback_data': joinData }]];
   return inlineKeyboard;
 };
 
@@ -58,14 +60,15 @@ const addUser = obj => { //adds a user to the game
     obj.users.push(obj.username);
     obj.game = matrixCreate(obj.game); // create matrix
     const joinData = `${obj.gameID}:addUser:${obj.username}`;
-    const inlineKeyboard = [[{ text: 'Join!', callback_data: joinData }]];
+    const inlineKeyboard = [[{ text: 'Join!', 'callback_data': joinData }]];
     if (obj.users.length >= 2) {
       const startData = `${obj.gameID}:startGame:${obj.username}`;
-      inlineKeyboard.push([{ text: 'Start!', callback_data: startData }]);
+      inlineKeyboard.push([{ text: 'Start!', 'callback_data': startData }]);
     }
     const keyboard = genKeyboard(inlineKeyboard);
     const user = 'Players:\n' + obj.users.join('\n');
-    obj.bot.telegram.editMessageText(obj.chatID, obj.messageID, undefined, user, keyboard);
+    obj.bot.telegram.editMessageText(obj.chatID, obj.messageID,
+      undefined, user, keyboard);
   }
 };
 
@@ -78,23 +81,26 @@ const startGame = obj => { //starts the game
     inlineKeyboard.push([]);
     for (let j = 0; j < obj.game.N; j++) {
       const crossData = `${obj.gameID}:addCross:${i}-${j}`.toString();
-      inlineKeyboard[i].push({ text: ' ', callback_data: crossData });
+      inlineKeyboard[i].push({ text: ' ', 'callback_data': crossData });
     }
   }
   const keyboard = genKeyboard(inlineKeyboard);
   const vs = obj.users.join(' vs ') + `\nTurn: ${obj.game.turn}`.toString();
-  obj.bot.telegram.editMessageText(obj.chatID, obj.messageID, undefined, vs, keyboard);
+  obj.bot.telegram.editMessageText(obj.chatID, obj.messageID,
+    undefined, vs, keyboard);
 };
 
 const turn = (isEnded, obj, keyboard, repeat) => { //next turn
   if (isEnded) {
     const looseData = `${obj.game.turn} has lost!`;
-    obj.bot.telegram.editMessageText(obj.chatID, obj.messageID, undefined, looseData);
+    obj.bot.telegram.editMessageText(obj.chatID, obj.messageID,
+      undefined, looseData);
     obj.game = null;
   } else if (!repeat) {
     obj.game.turn = nextTurn(obj.game.turn, obj.users);
     const vs = obj.users.join(' vs ') + `\nTurn: ${obj.game.turn}`.toString();
-    obj.bot.telegram.editMessageText(obj.chatID, obj.messageID, undefined, vs, keyboard);
+    obj.bot.telegram.editMessageText(obj.chatID, obj.messageID,
+      undefined, vs, keyboard);
   }
 };
 
@@ -109,7 +115,7 @@ const addCross = obj => { //ads a cross
       for (let j = 0; j < obj.game.N; j++) {
         const crossData = `${obj.gameID}:addCross:${i}-${j}`.toString();
         const cross = matrix[i][j] ? '❌' : ' ';
-        inlineKeyboard[i].push({ text: cross, callback_data: crossData });
+        inlineKeyboard[i].push({ text: cross, 'callback_data': crossData });
       }
     }
     const keyboard = genKeyboard(inlineKeyboard);
