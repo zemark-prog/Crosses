@@ -1,10 +1,10 @@
 'use strict';
 
 const Telegraf = require('telegraf');
-const CONSTANTS = require('./modules/config.js');
-const FUNCTIONS = require('./modules/functions.js');
-const { TOKEN, BOT_URL } = CONSTANTS;
-const { replyFile, getGameById, start, addUser, startGame, addCross, genKeyboard } = FUNCTIONS;
+const constants = require('./modules/config.js');
+const functions = require('./modules/functions.js');
+const { TOKEN, BOT_URL } = constants;
+const { replyFile, getGameById, start, addUser, startGame, addCross, genKeyboard } = functions;
 
 const bot = new Telegraf(TOKEN);
 
@@ -27,8 +27,8 @@ bot.on('text', ctx => {
       ctx.reply('This bot is used in group chats only');
     } else {
       const username = ctx.message.from.username;
-      const inline_keyboard = start(secondPart, chatID, username, CHATES);
-      const keyboard = genKeyboard(inline_keyboard);
+      const inlineKeyboard = start(secondPart, chatID, username, CHATES);
+      const keyboard = genKeyboard(inlineKeyboard);
       ctx.reply('Current users:\n' + username + '\n', keyboard);
     }
   }

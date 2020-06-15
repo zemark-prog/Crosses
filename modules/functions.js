@@ -1,10 +1,10 @@
 'use strict';
 
-const MATRIX = require('./matrixProcessing');
-const CONSTANTS = require('./config.js');
+const matrix = require('./matrixProcessing');
+const constants = require('./config.js');
 const fs = require('fs');
-const { matrixModify, checker, matrixCreate } = MATRIX;
-const { MAX_BUTTONS, MIN_BUTTONS } = CONSTANTS;
+const { matrixModify, checker, matrixCreate } = matrix;
+const { MAX_BUTTONS, MIN_BUTTONS } = constants;
 
 function getGameById(gameID, chatID, CHATES) { //finds the right game
   if (CHATES[chatID]) {
@@ -34,9 +34,9 @@ const processingNum = secondPart => { //processing the side size
   return secondPart;
 };
 
-const genKeyboard = inline_keyboard => ({
+const genKeyboard = inlineKeyboard => ({
   reply_markup: JSON.stringify({
-    inline_keyboard,
+    inline_keyboard: inlineKeyboard,
   }),
 });
 
@@ -44,12 +44,13 @@ const start = (secondPart, chatID, username, CHATES) => { //makes keyboard after
   secondPart = processingNum(secondPart);
   if (!CHATES[chatID]) CHATES[chatID] = { games: {} };
   const currGameAmount = Object.keys(CHATES[chatID].games).length;
-  CHATES[chatID].games[currGameAmount + 1] = { };
-  CHATES[chatID].games[currGameAmount + 1].users = [username];
-  CHATES[chatID].games[currGameAmount + 1].N = secondPart;
+  CHATES[chatID].games[currGameAmount + 1] = {
+    users: [username],
+    N: secondPart,
+  };
   const joinData = `${currGameAmount + 1}:addUser:${username}`;
-  const inline_keyboard = [[{ text: 'Join!', callback_data: joinData }]];
-  return inline_keyboard;
+  const inlineKeyboard = [[{ text: 'Join!', callback_data: joinData }]];
+  return inlineKeyboard;
 };
 
 const addUser = obj => { //adds a user to the game
@@ -57,12 +58,12 @@ const addUser = obj => { //adds a user to the game
     obj.users.push(obj.username);
     obj.game = matrixCreate(obj.game); // create matrix
     const joinData = `${obj.gameID}:addUser:${obj.username}`;
-    const inline_keyboard = [[{ text: 'Join!', callback_data: joinData }]];
+    const inlineKeyboard = [[{ text: 'Join!', callback_data: joinData }]];
     if (obj.users.length >= 2) {
       const startData = `${obj.gameID}:startGame:${obj.username}`;
-      inline_keyboard.push([{ text: 'Start!', callback_data: startData }]);
+      inlineKeyboard.push([{ text: 'Start!', callback_data: startData }]);
     }
-    const keyboard = genKeyboard(inline_keyboard);
+    const keyboard = genKeyboard(inlineKeyboard);
     const user = 'Players:\n' + obj.users.join('\n');
     obj.bot.telegram.editMessageText(obj.chatID, obj.messageID, undefined, user, keyboard);
   }
@@ -72,15 +73,15 @@ const startGame = obj => { //starts the game
   const random = randomInt(0, obj.users.length - 1);
   const currUser = obj.users[random];//first turn choosage
   obj.game.turn = currUser;
-  const inline_keyboard = [];
+  const inlineKeyboard = [];
   for (let i = 0; i < obj.game.N; i++) {
-    inline_keyboard.push([]);
+    inlineKeyboard.push([]);
     for (let j = 0; j < obj.game.N; j++) {
       const crossData = `${obj.gameID}:addCross:${i}-${j}`.toString();
-      inline_keyboard[i].push({ text: ' ', callback_data: crossData });
+      inlineKeyboard[i].push({ text: ' ', callback_data: crossData });
     }
   }
-  const keyboard = genKeyboard(inline_keyboard);
+  const keyboard = genKeyboard(inlineKeyboard);
   const vs = obj.users.join(' vs ') + `\nTurn: ${obj.game.turn}`.toString();
   obj.bot.telegram.editMessageText(obj.chatID, obj.messageID, undefined, vs, keyboard);
 };
@@ -102,16 +103,16 @@ const addCross = obj => { //ads a cross
     const matrix = obj.game.matrix;
     const coords = obj.queryData.split('-');
     const repeat = matrixModify(coords, matrix);
-    const inline_keyboard = [];
+    const inlineKeyboard = [];
     for (let i = 0; i < obj.game.N; i++) {
-      inline_keyboard.push([]);
+      inlineKeyboard.push([]);
       for (let j = 0; j < obj.game.N; j++) {
         const crossData = `${obj.gameID}:addCross:${i}-${j}`.toString();
         const cross = matrix[i][j] ? '❌' : ' ';
-        inline_keyboard[i].push({ text: cross, callback_data: crossData });
+        inlineKeyboard[i].push({ text: cross, callback_data: crossData });
       }
     }
-    const keyboard = genKeyboard(inline_keyboard);
+    const keyboard = genKeyboard(inlineKeyboard);
     const isCornerInField = checker(matrix);
     const isEnded = isCornerInField(coords[0], coords[1]);
     console.log(coords[0], coords[1], isEnded, matrix);
